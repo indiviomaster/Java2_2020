@@ -3,7 +3,7 @@ package lesson1;
 public class Robot implements Player{
     @Override
     public String toString() {
-        return "Robot maxJump = "+jumpingHeight+ " maxRun = "+ runningDistance;
+        return "Робот максиальная высота прыжка = "+jumpingHeight+ " максимальная дальность бега = "+ runningDistance;
     }
 
     double jumpingHeight;
