@@ -16,12 +16,12 @@ public class Track extends Barrier {
         return length;
     }
     public int setPlayer(Player player){
-        if(player.getJumpingHeight()>=this.length) {
+        if(player.getRunningDistance()>=this.length) {
             player.run();
             return 0;
         }
         else{
-            System.out.println("Не могу пробежать");
+            System.out.println("Не пробегу!");
             return 1;
         }
     }
