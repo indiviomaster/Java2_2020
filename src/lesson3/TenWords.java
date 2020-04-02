@@ -20,6 +20,10 @@ public class TenWords {
             }
             mapWords.put(arr[i], k);
         }
-        System.out.println(mapWords);
+
+        for (String key : mapWords.keySet()) {
+            System.out.println("| " + key + " -> " +  mapWords.get(key));
+        }
+        //System.out.println(mapWords);
         }
 }
