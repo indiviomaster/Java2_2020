@@ -17,12 +17,12 @@ public class MultiThread {
             e.printStackTrace();
         }
 
-       /* for(int i=0; i<array1.length;i++) {
+        for(int i=0; i<array1.length;i++) {
             if((array1[i]-array2[i])!=0) {
                 System.out.print(i +" " +(array1[i]-array2[i]) );
                 break;
             }
-        }*/
+        }
     }
 
     public static void func1(){
@@ -53,11 +53,11 @@ public class MultiThread {
         System.arraycopy(arr,0,arrCopy1,0,h);
         System.arraycopy(arr,h,arrCopy2,0,h);
 
-        Task task1  = new Task(arrCopy1);
+        Task task1  = new Task(arrCopy1,0);
         Thread th1 = new Thread(task1);
         arrCopy1 = task1.getArrayIn();
 
-        Task task2  = new Task(arrCopy2);
+        Task task2  = new Task(arrCopy2,h);
         Thread th2 = new Thread(task2);
         arrCopy2 = task2.getArrayIn();
 
@@ -76,9 +76,12 @@ public class MultiThread {
 
     static class Task implements Runnable{
         float [] arrayIn;
+        int index;
 
-        public Task(float[] arrayIn) {
+        public Task(float[] arrayIn, int index) {
+
             this.arrayIn = arrayIn;
+            this.index = index;
         }
 
         public float[] getArrayIn() {
@@ -89,9 +92,9 @@ public class MultiThread {
 
             for(int i=0; i<arrayIn.length; i++){
                 arrayIn[i]=(float)(arrayIn[i]*
-                        Math.sin(0.2f+i/5)*
-                        Math.cos(0.2f+i/5)*
-                        Math.cos(0.4f+i/2));
+                        Math.sin(0.2f+(i+index)/5)*
+                        Math.cos(0.2f+(i+index)/5)*
+                        Math.cos(0.4f+(i+index)/2));
             }
         }
     }
