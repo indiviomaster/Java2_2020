@@ -1,92 +1,98 @@
 package lesson5;
 
-import javax.swing.*;
-
 public class MultiThread {
     static final int size = 10_000_000;
     static final int h = size/2;
+    static float [] arr = new float[size];
+    static float [] array1 = new float[size];
+    static float [] array2 = new float[size];
 
     public static void main(String[] args) {
 
         func1();
+
         try {
             func2();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+       /* for(int i=0; i<array1.length;i++) {
+            if((array1[i]-array2[i])!=0) {
+                System.out.print(i +" " +(array1[i]-array2[i]) );
+                break;
+            }
+        }*/
     }
 
     public static void func1(){
-        float [] arr = new float[size];
-        for(int i=1; i<size; i++){
+        for(int i=0; i<arr.length; i++){
             arr[i]=1;
         }
         long a= System.currentTimeMillis();
 
-        arr = calc(arr);
+        for(int i=0; i<arr.length; i++){
+            array1[i]=(float)(arr[i]*
+                    Math.sin(0.2f+i/5)*
+                    Math.cos(0.2f+i/5)*
+                    Math.cos(0.4f+i/2));
+        }
+
         long b= System.currentTimeMillis();
         System.out.println("Time calculation 1: " + (b-a));
 
     }
     public static void func2() throws InterruptedException {
-        float [] arr = new float[size];
-        for(int i=1; i<size; i++){
+        for(int i=0; i<arr.length; i++){
             arr[i]=1;
         }
-        final float [] arrCopy = new float[h];
-        final float [] arrCopy2 = new float[h];
+        float [] arrCopy1 = new float[h];
+        float [] arrCopy2 = new float[h];
         long a= System.currentTimeMillis();
 
-        System.arraycopy(arr,0,arrCopy,0,h);
+        System.arraycopy(arr,0,arrCopy1,0,h);
         System.arraycopy(arr,h,arrCopy2,0,h);
 
-        Thread th1 = new Thread(()->{
-            for(int i=1; i<arrCopy.length; i++){
-            arrCopy[i]=(float)(arrCopy[i]*
-                    Math.sin(0.2f+i/5)*
-                    Math.cos(0.2f+i/5)*
-                    Math.cos(0.4f+i/2));
-        } });
+        Task task1  = new Task(arrCopy1);
+        Thread th1 = new Thread(task1);
+        arrCopy1 = task1.getArrayIn();
 
-        Thread th2 = new Thread(()->{
-            for(int i=1; i<arrCopy2.length; i++){
-                arrCopy2[i]=(float)(arrCopy2[i]*
-                        Math.sin(0.2f+i/5)*
-                        Math.cos(0.2f+i/5)*
-                        Math.cos(0.4f+i/2));
-            } });
-
-        /*Thread th2 = new Thread(()->{
-            float [] arrC2 = new float[h];
-            for(int i=1; i<arrCopy2.length; i++){
-                arrC2[i]= arrCopy2[i];
-            }
-            arrC2 = calc(arrC2);
-            for(int i=1; i<arrCopy2.length; i++) {
-                arrCopy2[i] = arrC2[i];
-            }
-        });*/
+        Task task2  = new Task(arrCopy2);
+        Thread th2 = new Thread(task2);
+        arrCopy2 = task2.getArrayIn();
 
         th1.start();
         th2.start();
+
         th1.join();
         th2.join();
 
-        System.arraycopy(arrCopy,0,arr,0,h);
-        System.arraycopy(arrCopy2,0,arr,h,h);
+        System.arraycopy(arrCopy1,0,array2,0,h);
+        System.arraycopy(arrCopy2,0,array2,h,h);
 
         long b= System.currentTimeMillis();
         System.out.println("Time calculation 2: " + (b-a));
-
     }
-    public static float[] calc(float [] ar){
-        for(int i=1; i<ar.length; i++){
-            ar[i]=(float)(ar[i]*
-                    Math.sin(0.2f+i/5)*
-                    Math.cos(0.2f+i/5)*
-                    Math.cos(0.4f+i/2));
+
+    static class Task implements Runnable{
+        float [] arrayIn;
+
+        public Task(float[] arrayIn) {
+            this.arrayIn = arrayIn;
         }
-        return ar;
+
+        public float[] getArrayIn() {
+            return arrayIn;
+        }
+
+        public void run() {
+
+            for(int i=0; i<arrayIn.length; i++){
+                arrayIn[i]=(float)(arrayIn[i]*
+                        Math.sin(0.2f+i/5)*
+                        Math.cos(0.2f+i/5)*
+                        Math.cos(0.4f+i/2));
+            }
+        }
     }
 }
