@@ -19,7 +19,7 @@ public class Wall extends Barrier {
             return 0;
         }
         else{
-            System.out.println("Не могу перепрыгнуть");
+            System.out.println("Не перепрыгну!");
             return 1;
         }
 
