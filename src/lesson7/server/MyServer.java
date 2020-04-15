@@ -51,6 +51,13 @@ public class MyServer {
             o.sendMsg(msg);
         }
     }
+    public synchronized void broadcastToMsg(String nickName, String msg) {
+        for (ClientHandler o : clients) {
+            if(o.getName().equals(nickName)){
+                System.out.println("отправляем "+o.getName());
+            o.sendMsg(msg);}
+        }
+    }
 
     public synchronized void unsubscribe(ClientHandler o) {
         clients.remove(o);
@@ -59,4 +66,15 @@ public class MyServer {
     public synchronized void subscribe(ClientHandler o) {
         clients.add(o);
     }
+
+    public synchronized String getClientOnServer() {
+        String clientOnServer = "";
+        for (ClientHandler o : clients) {
+                if(o.getName().trim()!=""){
+                clientOnServer +=o.getName().trim()+" ";
+            }
+        }
+        return clientOnServer;
+    }
+
 }

@@ -61,6 +61,7 @@ public class Controller implements Initializable {
         network.sendAuth(loginField.getText(), passField.getText());
         loginField.clear();
         passField.clear();
+        textArea.clear();
     }
 
     public void sendMsg() {
@@ -93,13 +94,17 @@ public class Controller implements Initializable {
             if (msg.startsWith("/")) {
                 if (msg.startsWith("/clients ")) {
                     String[] tokens = msg.split("\\s");
+
                     Platform.runLater(() -> {
+
                         clientsList.getItems().clear();
                         for (int i = 1; i < tokens.length; i++) {
-                            clientsList.getItems().add(tokens[i]);
+                            if(!(tokens[i].trim().equals(nickname))&&(tokens[i].trim()!="")&&(tokens[i].trim()!=null))
+                            {clientsList.getItems().add(tokens[i]);}
                         }
                     });
                 }
+
             } else {
                 textArea.appendText(msg + "\n");
             }
