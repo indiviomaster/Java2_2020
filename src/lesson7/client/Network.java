@@ -34,16 +34,17 @@ public class Network implements Closeable {
 
     public void sendAuth(String login, String password) {
         try {
-            if (socket == null || socket.isClosed()) {
-                connect();
-            }
+            connect();
             out.writeUTF("/auth " + login + " " + password);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void connect() {
+    public void connect() {
+        if (socket != null && !socket.isClosed()) {
+            return;
+        }
         try {
             socket = new Socket("localhost", 8189);
             in = new DataInputStream(socket.getInputStream());

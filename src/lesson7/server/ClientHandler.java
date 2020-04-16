@@ -42,20 +42,15 @@ public class ClientHandler {
     public void authentication() throws IOException {
         while (true) {
             String str = in.readUTF();
-            String listOfClients;
             if (str.startsWith("/auth")) {
                 String[] parts = str.split("\\s");
                 String nick = myServer.getAuthService().getNickByLoginPass(parts[1], parts[2]);
                 if (nick != null) {
                     if (!myServer.isNickBusy(nick)) {
                         sendMsg("/authok " + nick);
-
                         name = nick;
                         myServer.broadcastMsg(name + " зашел в чат");
                         myServer.subscribe(this);
-                        if(myServer.getClientOnServer()!="") {
-                            myServer.broadcastMsg("/clients " + myServer.getClientOnServer());
-                        }
                         return;
                     } else {
                         sendMsg("Учетная запись уже используется");
@@ -68,21 +63,21 @@ public class ClientHandler {
     }
 
     public void readMessages() throws IOException {
-
         while (true) {
             String strFromClient = in.readUTF();
-            String[] tokens = strFromClient.split("\\s");
-
             System.out.println("от " + name + ": " + strFromClient);
-            if (tokens[0].equals("/end")) {
+            if (strFromClient.equals("/end")) {
                 return;
             }
-            if(tokens[0].equals("/w")){
 
-                myServer.broadcastToMsg(tokens[1], name + ": " + tokens[2]);
-            }else{ myServer.broadcastMsg(name + ": " + strFromClient);}
-
-
+            if (strFromClient.startsWith("/w")) {
+                String[] tokens = strFromClient.split("\\s");
+                String nick = tokens[1];
+                String msg = strFromClient.substring(4 + nick.length());
+                myServer.sendMsgToClient(name, nick, msg);
+            } else {
+                myServer.broadcastMsg(name, strFromClient);
+            }
         }
     }
 
@@ -97,9 +92,6 @@ public class ClientHandler {
     public void closeConnection() {
         myServer.unsubscribe(this);
         myServer.broadcastMsg(name + " вышел из чата");
-        if(myServer.getClientOnServer()!="") {
-            myServer.broadcastMsg("/clients " + myServer.getClientOnServer());
-        }
         try {
             in.close();
         } catch (IOException e) {

@@ -3,13 +3,13 @@ package lesson7.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyServer {
     private final int PORT = 8189;
 
-    private List<ClientHandler> clients;
+    private Map<String, ClientHandler> clients;
     private AuthService authService;
 
     public AuthService getAuthService() {
@@ -20,7 +20,7 @@ public class MyServer {
         try (ServerSocket server = new ServerSocket(PORT)) {
             authService = new BaseAuthService();
             authService.start();
-            clients = new ArrayList<>();
+            clients = new HashMap<>();
 
             while (true) {
                 System.out.println("Сервер ожидает подключения");
@@ -38,43 +38,44 @@ public class MyServer {
     }
 
     public synchronized boolean isNickBusy(String nick) {
-        for (ClientHandler o : clients) {
-            if (o.getName().equals(nick)) {
-                return true;
-            }
-        }
-        return false;
+                return clients.containsKey(nick);
     }
 
     public synchronized void broadcastMsg(String msg) {
-        for (ClientHandler o : clients) {
+        for (ClientHandler o : clients.values()) {
             o.sendMsg(msg);
         }
     }
-    public synchronized void broadcastToMsg(String nickName, String msg) {
-        for (ClientHandler o : clients) {
-            if(o.getName().equals(nickName)){
-                System.out.println("отправляем "+o.getName());
-            o.sendMsg(msg);}
+    public synchronized void broadcastMsg(String from, String msg) {
+        broadcastMsg(formatMessage(from, msg));
+    }
+
+    public synchronized void sendMsgToClient(String from, String to, String msg) {
+        if (clients.containsKey(to)) {
+            clients.get(to).sendMsg(formatMessage(from, msg));
         }
     }
 
     public synchronized void unsubscribe(ClientHandler o) {
-        clients.remove(o);
+        clients.remove(o.getName());
+        broadcastClients();
     }
 
     public synchronized void subscribe(ClientHandler o) {
-        clients.add(o);
+        clients.put(o.getName(),o);
+        broadcastClients();
     }
 
-    public synchronized String getClientOnServer() {
-        String clientOnServer = "";
-        for (ClientHandler o : clients) {
-                if(o.getName().trim()!=""){
-                clientOnServer +=o.getName().trim()+" ";
-            }
+    private String formatMessage(String from, String msg) {
+        return from + ": " + msg;
+    }
+
+    public synchronized void broadcastClients() {
+        StringBuilder builder = new StringBuilder("/clients ");
+        for (String nick : clients.keySet()) {
+            builder.append(nick).append(' ');
         }
-        return clientOnServer;
+        broadcastMsg(builder.toString());
     }
 
 }

@@ -3,6 +3,7 @@ package lesson7.client;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 
@@ -46,22 +47,15 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setAuthenticated(false);
-        clientsList.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                String nickname = clientsList.getSelectionModel().getSelectedItem();
-                msgField.setText("/w " + nickname + " ");
-                msgField.requestFocus();
-                msgField.selectEnd();
-            }
-        });
-        linkCallbacks();
+        clientsList.setOnMouseClicked(this::clientClickHandler);
+        createNetwork();
+        network.connect();
     }
 
     public void sendAuth() {
         network.sendAuth(loginField.getText(), passField.getText());
         loginField.clear();
         passField.clear();
-        textArea.clear();
     }
 
     public void sendMsg() {
@@ -71,6 +65,10 @@ public class Controller implements Initializable {
         }
     }
 
+    public void sendExit(){
+        network.sendMsg("/end");
+    }
+
     public void showAlert(String msg) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.WARNING, msg, ButtonType.OK);
@@ -78,7 +76,7 @@ public class Controller implements Initializable {
         });
     }
 
-    public void linkCallbacks() {
+    public void createNetwork() {
         network = new Network();
         network.setCallOnException(args -> showAlert(args[0].toString()));
 
@@ -109,5 +107,14 @@ public class Controller implements Initializable {
                 textArea.appendText(msg + "\n");
             }
         });
+    }
+
+    private void clientClickHandler(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            String nickname = clientsList.getSelectionModel().getSelectedItem();
+            msgField.setText("/w " + nickname + " ");
+            msgField.requestFocus();
+            msgField.selectEnd();
+        }
     }
 }
