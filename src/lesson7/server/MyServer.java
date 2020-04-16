@@ -25,6 +25,7 @@ public class MyServer {
             while (true) {
                 System.out.println("Сервер ожидает подключения");
                 Socket socket = server.accept();
+
                 System.out.println("Клиент подключился");
                 new ClientHandler(this, socket);
             }

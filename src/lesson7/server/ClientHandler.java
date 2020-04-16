@@ -10,6 +10,7 @@ public class ClientHandler {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    static final int TIME_OUT_TO_LOGIN = 120000;
 
     private String name;
 
@@ -24,6 +25,24 @@ public class ClientHandler {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
             this.name = "";
+
+            new Thread(() -> {
+
+                try {
+                    Thread.sleep(TIME_OUT_TO_LOGIN);
+                    if(name=="") {
+                        System.out.println("Клиент отключен по таймауту");
+
+                        this.in.close();
+                        this.out.close();
+                        this.socket.close();
+                    }
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+
+            }).start();
+
             new Thread(() -> {
                 try {
                     authentication();
