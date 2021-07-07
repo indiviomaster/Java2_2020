@@ -3,7 +3,15 @@ package lesson1;
 public class Human implements Player {
     @Override
     public String toString() {
-        return "Human maxJump = "+jumpingHeight+ " maxRun = "+ runningDistance;
+        return "Человек максиальная высота прыжка = "+jumpingHeight+ " максимальная дальность бега = "+ runningDistance;
+    }
+
+    public void setJumpingHeight(double jumpingHeight) {
+        this.jumpingHeight = jumpingHeight;
+    }
+
+    public void setRunningDistance(double runningDistance) {
+        this.runningDistance = runningDistance;
     }
 
     @Override
